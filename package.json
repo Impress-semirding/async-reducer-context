@@ -1,5 +1,5 @@
 {
-  "name": "react-saga-hook",
+  "name": "use-saga-context",
   "version": "1.0.0",
   "description": "",
   "main": "libs/index.js",
@@ -11,6 +11,14 @@
     "type": "git",
     "url": "git+https://github.com/Impress-semirding/react-saga-hook.git"
   },
+  "keywords": [
+    "react",
+    "reactjs",
+    "saga",
+    "hook",
+    "useContext",
+    "useReducer"
+  ],
   "author": "steven Ding",
   "license": "ISC",
   "bugs": {

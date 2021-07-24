@@ -23,7 +23,7 @@ function createReducer(initState: IState = {}, actionMap?: IActionMap) {
   };
 }
 
-export default function createStore(reducers: IActionMap, initState: IState, rootSaga: any) {
+export default function createStore(reducers: IActionMap, rootSaga: any, initState: IState) {
   const reducer = createReducer(initState, reducers);
   const RootContext = createContext(initState);
   const sagaMiddleware = createSagaMiddleware();

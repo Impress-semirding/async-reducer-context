@@ -21,7 +21,7 @@ function createReducer(initState, actionMap) {
         return state;
     };
 }
-export default function createStore(reducers, initState, rootSaga) {
+export default function createStore(reducers, rootSaga, initState) {
     var reducer = createReducer(initState, reducers);
     var RootContext = createContext(initState);
     var sagaMiddleware = createSagaMiddleware();

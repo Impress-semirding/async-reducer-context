@@ -1,0 +1,40 @@
+{
+  "name": "react-saga-hook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "libs/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -t es5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Impress-semirding/react-saga-hook.git"
+  },
+  "author": "steven Ding",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Impress-semirding/react-saga-hook/issues"
+  },
+  "homepage": "https://github.com/Impress-semirding/react-saga-hook#readme",
+  "dependencies": {
+    "react": "^17.0.2",
+    "redux-saga": "^1.1.3"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.11",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "babel-loader": "^8.2.2",
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^2.4.1",
+    "jest": "^27.0.6",
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.2"
+  }
+}

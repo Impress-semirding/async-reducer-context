@@ -1,5 +1,5 @@
 {
-  "name": "use-saga-context",
+  "name": "react-hook-middleware",
   "version": "1.0.0",
   "description": "",
   "main": "libs/index.js",
@@ -14,7 +14,9 @@
   "keywords": [
     "react",
     "reactjs",
-    "saga",
+    "redux-thunk",
+    "redux-promise",
+    "redux-saga",
     "hook",
     "useContext",
     "useReducer"

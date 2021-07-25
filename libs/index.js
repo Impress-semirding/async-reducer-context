@@ -1,4 +1,4 @@
-import createStore from './createSagaStore';
+import createRoot from './createRoot';
 import applyMiddleware from './applyMiddleware';
-export default createStore;
+export default createRoot;
 export { applyMiddleware, };

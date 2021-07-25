@@ -1,11 +1,10 @@
 import React, { createContext, useCallback, useEffect } from 'react';
-import createSagaMiddleware from 'redux-saga';
-import applyMiddleware from './applyMiddleware';
+import EventEmitter from './event';
 import IState, { IAction, IActionMap } from './types';
 
 const { useReducer } = React;
 
-function createReducer(initState: IState = {}, actionMap?: IActionMap) {
+function createReducer(initState: any = {}, actionMap?: IActionMap) {
   let handles: IActionMap = {};
   //  fix for reducer hook one params.
   if (!actionMap) {
@@ -23,37 +22,43 @@ function createReducer(initState: IState = {}, actionMap?: IActionMap) {
   };
 }
 
-export default function createStore(reducers: IActionMap, rootSaga: any, initState: IState) {
+export default function createRoot(
+  reducers: IActionMap, initState: IState, enhancer: any,
+) {
   const reducer = createReducer(initState, reducers);
-  const RootContext = createContext(initState);
-  const sagaMiddleware = createSagaMiddleware();
-  const enhancer = applyMiddleware(sagaMiddleware);
+  const context = createContext(initState);
+  const event = new EventEmitter();
 
-  const Provider = ({ children }: { children: React.ReactChildren }) => {
+  const ready = (callback: any) => {
+    event.on(callback);
+  };
+
+  const Provider = ({ children }: any) => {
     const [state, dispatch] = useReducer(reducer, initState);
     const getState = useCallback(() => state, [state]);
-    const log = (action: IAction) => {
-      // if (window.location.href.includes('debug=true')) {
-      //   console.log(action);
-      // }
+    const log = (action: any) => {
+      if (window.location.href.includes('debug=true')) {
+        console.log(action);
+      }
       dispatch(action);
     };
 
     const { dispatch: enhanceDispatch } = enhancer({ getState, dispatch: log });
 
     useEffect(() => {
-      sagaMiddleware.run(rootSaga);
+      event.run();
     }, []);
 
     return (
-      <RootContext.Provider value={{ state, dispatch: enhanceDispatch }}>
+      <context.Provider value={{ state, dispatch: enhanceDispatch }}>
         {children}
-      </RootContext.Provider>
+      </context.Provider>
     );
   };
 
   return {
-    RootContext,
+    context,
     Provider,
+    ready,
   };
 }

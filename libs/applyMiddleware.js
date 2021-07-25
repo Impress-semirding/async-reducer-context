@@ -20,6 +20,7 @@ export default function applyMiddleware() {
         middlewares[_i] = arguments[_i];
     }
     return function (store) {
+        // eslint-disable-next-line no-unused-vars
         var dispatch = function (action) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {

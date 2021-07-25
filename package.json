@@ -1,6 +1,6 @@
 {
-  "name": "rect-hook-middleware",
-  "version": "1.0.0",
+  "name": "async-reducer-context",
+  "version": "1.0.1",
   "description": "",
   "main": "libs/index.js",
   "scripts": {

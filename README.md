@@ -1,10 +1,10 @@
-# rect-hook-middleware
+# async-reducer-context
 
 a.js
 ```
 import createSagaMiddleware from 'redux-saga';
 import reduxThunk from 'redux-thunk';
-import createRoot, { applyMiddleware } from 'react-hook-middleware';
+import createRoot, { applyMiddleware } from 'async-reducer-context';
 
 import helloSaga from './sagas/hello';
 

@@ -3,7 +3,6 @@ import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import EventEmitter from './event';
 import Subs from './sub';
-console.log(React);
 var createContext = React.createContext, useState = React.useState, useCallback = React.useCallback, useEffect = React.useEffect, useMemo = React.useMemo, useReducer = React.useReducer, useRef = React.useRef, useContext = React.useContext;
 function createReducer(initState, actionMap) {
     if (initState === void 0) { initState = {}; }
@@ -32,7 +31,6 @@ export default function createRoot(reducers, enhancer) {
     var ready = function (callback) {
         event.on(callback);
     };
-    var userStore = function () { return useContext(context); };
     var useModel = function (deps) {
         if (deps === void 0) { deps = []; }
         var memorizeDeps = useMemo(function () { return deps; }, []);
@@ -48,33 +46,46 @@ export default function createRoot(reducers, enhancer) {
                 var prev = prevDepsRef.current;
                 var curr = get(container.state, memorizeDeps);
                 if (!isEqual(prev, curr)) {
-                    setState(state);
+                    setState(curr);
                 }
-                prev.current = curr;
+                prevDepsRef.current = curr;
             };
             subs.add(observer);
             return function () {
                 subs.delete(observer);
             };
         }, []);
-        return state;
+        return [state, container.dispatch];
     };
+    var Store = /** @class */ (function () {
+        function Store() {
+        }
+        Store.prototype.getState = function () {
+            return this.state;
+        };
+        Store.prototype.set = function (value) {
+            this.state = value;
+        };
+        return Store;
+    }());
+    var store = new Store();
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
-        var _b = useReducer(reducer, value), state = _b[0], dispatch = _b[1];
-        var ref = useRef({ state: value, subs: new Subs(state) });
-        useEffect(function () {
-            ref.current.state = state;
-            ref.current.subs.notify();
-        });
-        var getState = function () { return state; };
+        var _b = useReducer(function (s, payload) {
+            var n = reducer(s, payload);
+            store.set(n);
+            return n;
+        }, value), state = _b[0], dispatch = _b[1];
+        var ref = useRef({ state: value, subs: new Subs(state), dispatch: dispatch });
         var log = useCallback(function (action) {
-            if (window.location.href.includes('debug=true')) {
-                console.log(action);
-            }
             dispatch(action);
         }, []);
-        var enhanceDispatch = enhancer({ getState: getState, dispatch: log }).dispatch;
+        var enhanceDispatch = useCallback(enhancer({ getState: store.getState, dispatch: log }), [log]).dispatch;
+        useEffect(function () {
+            ref.current.state = state;
+            ref.current.dispatch = enhanceDispatch;
+            ref.current.subs.notify();
+        });
         useEffect(function () {
             event.run();
         }, []);
@@ -85,7 +96,6 @@ export default function createRoot(reducers, enhancer) {
         context: context,
         Provider: Provider,
         useModel: useModel,
-        userStore: userStore,
         ready: ready,
     };
 }

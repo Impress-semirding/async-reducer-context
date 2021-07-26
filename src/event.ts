@@ -1,4 +1,4 @@
-type ITake = () => void;
+type ITake = Function;
 
 class EventEmitter {
   take: ITake[]
@@ -7,7 +7,7 @@ class EventEmitter {
     this.take = [];
   }
 
-  on(callback: any) {
+  on(callback: Function) {
     this.take.push(callback);
   }
 

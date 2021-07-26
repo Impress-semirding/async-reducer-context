@@ -1,7 +1,11 @@
-export default function applyMiddleware(...middlewares: any) {
-  return (store: any) => {
+import {
+  IAction, IStore, Dispatch, Middleware,
+} from './types';
+
+export default function applyMiddleware(...middlewares: Middleware[]) {
+  return (store: IStore) => {
     // eslint-disable-next-line no-unused-vars
-    let dispatch = (action: any, ...args: any) => {
+    let dispatch: Dispatch = (action, ...args) => {
       throw new Error(
         'Dispatching while constructing your middleware is not allowed. '
         + 'Other middleware would not be applied to this dispatch.',
@@ -10,7 +14,7 @@ export default function applyMiddleware(...middlewares: any) {
 
     const middlewareAPI = {
       getState: store.getState,
-      dispatch: (action: any, ...args: any) => dispatch(action, ...args),
+      dispatch: (action: IAction, ...args: any) => dispatch(action, ...args),
     };
     const chain = middlewares.map((middleware: any) => middleware(middlewareAPI));
     dispatch = compose(...chain)(store.dispatch);
@@ -22,10 +26,10 @@ export default function applyMiddleware(...middlewares: any) {
   };
 }
 
-function compose(...funcs: any) {
+function compose(...funcs: Function[]) {
   if (funcs.length === 0) {
     // infer the argument type so it is usable in inference down the line
-    return (arg: any) => arg;
+    return <T>(arg: T) => arg;
   }
 
   if (funcs.length === 1) {
@@ -33,6 +37,6 @@ function compose(...funcs: any) {
   }
 
   return funcs.reduce(
-    (a: any, b: any) => (...args: any) => a(b(...args)),
+    (a, b) => (...args: any) => a(b(...args)),
   );
 }

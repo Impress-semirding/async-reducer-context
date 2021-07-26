@@ -3,9 +3,9 @@ import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import EventEmitter from './event';
 import Subs from './sub';
-import IState, { IAction, IActionMap } from './types';
-
-console.log(React);
+import IState, {
+  IAction, IActionMap, IProvider,
+} from './types';
 
 // eslint-disable-next-line no-unused-vars
 type IReducer = (state: IState, action: IAction) => IState;
@@ -36,15 +36,13 @@ export default function createRoot(
   reducers: IActionMap, enhancer: any,
 ) {
   const context = createContext({});
-  const subContext: any = createContext({});
+  const subContext = createContext({});
   const reducer = createReducer(reducers);
   const event = new EventEmitter();
 
-  const ready = (callback: any) => {
+  const ready = (callback: Function) => {
     event.on(callback);
   };
-
-  const userStore: any = () => useContext(context);
 
   const useModel = (deps: string[] = []) => {
     const memorizeDeps = useMemo(() => deps, []);
@@ -71,27 +69,46 @@ export default function createRoot(
       };
     }, []);
 
-    return state;
+    return [state, container.dispatch];
   };
 
-  const Provider = ({ value, children }: any) => {
-    const [state, dispatch] = useReducer(reducer, value);
-    const ref = useRef({ state: value, subs: new Subs(state) });
+  class Store {
+    state: any;
 
-    useEffect(() => {
-      ref.current.state = state;
-      ref.current.subs.notify();
-    });
+    getState() {
+      return this.state;
+    }
 
-    const getState = () => state;
-    const log = useCallback((action: any) => {
-      if (window.location.href.includes('debug=true')) {
-        console.log(action);
-      }
+    set(value: any) {
+      this.state = value;
+    }
+  }
+
+  const store = new Store();
+
+  const Provider = ({ value, children }: IProvider) => {
+    const [
+      state, dispatch,
+    ] = useReducer((s: IState, payload: IAction) => {
+      const n = reducer(s, payload);
+      store.set(n);
+      return n;
+    }, value);
+
+    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch });
+    const log = useCallback((action: IAction) => {
       dispatch(action);
     }, []);
 
-    const { dispatch: enhanceDispatch } = enhancer({ getState, dispatch: log });
+    const {
+      dispatch: enhanceDispatch,
+    } = useCallback(enhancer({ getState: store.getState, dispatch: log }), [log]);
+
+    useEffect(() => {
+      ref.current.state = state;
+      ref.current.dispatch = enhanceDispatch;
+      ref.current.subs.notify();
+    });
 
     useEffect(() => {
       event.run();
@@ -110,7 +127,6 @@ export default function createRoot(
     context,
     Provider,
     useModel,
-    userStore,
     ready,
   };
 }

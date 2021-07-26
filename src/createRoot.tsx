@@ -59,9 +59,9 @@ export default function createRoot(
         const prev: any = prevDepsRef.current;
         const curr = get(container.state, memorizeDeps);
         if (!isEqual(prev, curr)) {
-          setState(state);
+          setState(curr);
         }
-        prev.current = curr;
+        prevDepsRef.current = curr;
       };
       subs.add(observer);
       return () => {

@@ -78,9 +78,12 @@ export default function createRoot(reducers, enhancer) {
         }, value), state = _b[0], dispatch = _b[1];
         var ref = useRef({ state: value, subs: new Subs(state), dispatch: dispatch });
         var log = useCallback(function (action) {
+            if (window.location.href.includes('debug')) {
+                console.log(action);
+            }
             dispatch(action);
         }, []);
-        var enhanceDispatch = useCallback(enhancer({ getState: store.getState, dispatch: log }), [log]).dispatch;
+        var enhanceDispatch = useMemo(enhancer({ getState: store.getState, dispatch: log }), [log]).dispatch;
         useEffect(function () {
             ref.current.state = state;
             ref.current.dispatch = enhanceDispatch;

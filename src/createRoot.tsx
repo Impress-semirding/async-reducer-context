@@ -105,7 +105,7 @@ export default function createRoot(
 
     const {
       dispatch: enhanceDispatch,
-    } = useMemo(enhancer({ getState: store.getState, dispatch: log }), [log]);
+    } = useMemo(() => enhancer({ getState: store.getState, dispatch: log }), [log]);
 
     useEffect(() => {
       ref.current.state = state;

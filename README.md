@@ -1,8 +1,7 @@
 # async-reducer-context
+通过底层react-context,useReducer替代redux，同时支持与redux类似的middleware中间件功能，通过useModel(['props'])可获取state和dispatch，其中useModel已做到获取的属性值变化，组件才会重新渲染，摆脱useContext因context中无关数据导致重复渲染问题。
 
-在react-context,useReducer基础上提供异步能力，可以支持saga，thunk等，具体见demo。
-
-[demo](https://codesandbox.io/s/gallant-smoke-zmp0u?file=/src/component/title.js)
+推荐将global数据托管至async-reducer-context中，dispatch可支持同步异步等action。
 
 
 createProvider.js

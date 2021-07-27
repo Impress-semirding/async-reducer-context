@@ -83,7 +83,7 @@ export default function createRoot(reducers, enhancer) {
             }
             dispatch(action);
         }, []);
-        var enhanceDispatch = useMemo(enhancer({ getState: store.getState, dispatch: log }), [log]).dispatch;
+        var enhanceDispatch = useMemo(function () { return enhancer({ getState: store.getState, dispatch: log }); }, [log]).dispatch;
         useEffect(function () {
             ref.current.state = state;
             ref.current.dispatch = enhanceDispatch;

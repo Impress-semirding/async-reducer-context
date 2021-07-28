@@ -1,5 +1,8 @@
 # async-reducer-context
-通过react-context,useReducer替代redux，可扩展支持与redux周边middleware中间件，通过useModel(['key'])可获取state和dispatch，其中useModel已做到获取的属性值变化，组件才会重新渲染，摆脱useContext因context中无关数据导致的重复渲染问题。
+1.这是context和useReducer状态管理方案，解决了useContext频繁渲染问题。
+2.async-reducer-context可扩展支持redux的middleware中间件，让适应redux的同学也可以很好通过context，userReducer书写代码，是否使用决定权在于你。
+
+与其他useContext库对比，优点在于可以支持异步任务。
 
 [点击codesandbox](https://codesandbox.io/s/gallant-smoke-zmp0u?file=/src/index.js)
 
@@ -69,6 +72,7 @@ function App() {
 ```
 
 child.js
+组件可通过RootContext.useModel(['title'])获取对应state中title属性，这里其实是lodash.get(context.state, "[title]")，后续会持续改造优化.
 ```
 import React, { useEffect } from 'react';
 

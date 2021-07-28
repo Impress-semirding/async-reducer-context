@@ -69,6 +69,7 @@ export default function createRoot(reducers, enhancer) {
         return Store;
     }());
     var store = new Store();
+    var enhanceDispatch;
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
         var _b = useReducer(function (s, payload) {
@@ -76,14 +77,16 @@ export default function createRoot(reducers, enhancer) {
             store.set(n);
             return n;
         }, value), state = _b[0], dispatch = _b[1];
-        var ref = useRef({ state: value, subs: new Subs(state), dispatch: dispatch });
         var log = useCallback(function (action) {
             if (window.location.href.includes('debug')) {
                 console.log(action);
             }
             dispatch(action);
         }, []);
-        var enhanceDispatch = useMemo(function () { return enhancer({ getState: store.getState, dispatch: log }); }, [log]).dispatch;
+        if (!enhanceDispatch) {
+            enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
+        }
+        var ref = useRef({ state: value, subs: new Subs(state), dispatch: dispatch });
         useEffect(function () {
             ref.current.state = state;
             ref.current.dispatch = enhanceDispatch;

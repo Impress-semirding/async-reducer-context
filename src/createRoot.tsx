@@ -85,6 +85,7 @@ export default function createRoot(
   }
 
   const store = new Store();
+  let enhanceDispatch: Function;
 
   const Provider = ({ value, children }: IProvider) => {
     const [
@@ -95,7 +96,6 @@ export default function createRoot(
       return n;
     }, value);
 
-    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch });
     const log = useCallback((action: IAction) => {
       if (window.location.href.includes('debug')) {
         console.log(action);
@@ -103,9 +103,10 @@ export default function createRoot(
       dispatch(action);
     }, []);
 
-    const {
-      dispatch: enhanceDispatch,
-    } = useMemo(() => enhancer({ getState: store.getState, dispatch: log }), [log]);
+    if (!enhanceDispatch) {
+      enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
+    }
+    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch });
 
     useEffect(() => {
       ref.current.state = state;

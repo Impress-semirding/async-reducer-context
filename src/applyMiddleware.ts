@@ -5,7 +5,7 @@ import {
 export default function applyMiddleware(...middlewares: Middleware[]) {
   return (store: IStore) => {
     // eslint-disable-next-line no-unused-vars
-    let dispatch: Dispatch = (action, ...args) => {
+    const dispatch: Dispatch = (action, ...args) => {
       throw new Error(
         'Dispatching while constructing your middleware is not allowed. '
         + 'Other middleware would not be applied to this dispatch.',
@@ -17,12 +17,7 @@ export default function applyMiddleware(...middlewares: Middleware[]) {
       dispatch: (action: IAction, ...args: any) => dispatch(action, ...args),
     };
     const chain = middlewares.map((middleware: any) => middleware(middlewareAPI));
-    dispatch = compose(...chain)(store.dispatch);
-
-    return {
-      ...store,
-      dispatch,
-    };
+    return compose(...chain)(store.dispatch);
   };
 }
 

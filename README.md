@@ -1,5 +1,6 @@
 # async-reducer-context
 1.这是context和useReducer状态管理方案，解决了useContext频繁渲染问题。
+
 2.async-reducer-context可扩展支持redux的middleware中间件，让适应redux的同学也可以很好通过context，userReducer书写代码，是否使用决定权在于你。
 
 与其他useContext库对比，优点在于可以支持异步任务。

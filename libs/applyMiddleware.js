@@ -29,7 +29,8 @@ export default function applyMiddleware() {
             },
         };
         var chain = middlewares.map(function (middleware) { return middleware(middlewareAPI); });
-        return compose.apply(void 0, chain)(store.dispatch);
+        dispatch = compose.apply(void 0, chain)(store.dispatch);
+        return dispatch;
     };
 }
 function compose() {

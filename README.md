@@ -18,7 +18,7 @@ const reducers = {
 }
 
 const sagaMiddleware = createSagaMiddleware();
-const RootContext = createRoot(, applyMiddleware(reduxThunk, sagaMiddleware));
+const RootContext = createRoot(reducers, applyMiddleware(reduxThunk, sagaMiddleware));
 
 RootContext.ready(() => sagaMiddleware.run(rootSaga));
 

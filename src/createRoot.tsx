@@ -106,7 +106,7 @@ export default function createRoot(
     if (!enhanceDispatch) {
       enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
     }
-    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch });
+    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
 
     useEffect(() => {
       ref.current.state = state;

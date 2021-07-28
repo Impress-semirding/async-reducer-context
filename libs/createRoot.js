@@ -86,7 +86,7 @@ export default function createRoot(reducers, enhancer) {
         if (!enhanceDispatch) {
             enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
         }
-        var ref = useRef({ state: value, subs: new Subs(state), dispatch: dispatch });
+        var ref = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
         useEffect(function () {
             ref.current.state = state;
             ref.current.dispatch = enhanceDispatch;

@@ -11,7 +11,7 @@ import IState, {
 type IReducer = (state: IState, action: IAction) => IState;
 
 const {
-  createContext, useState, useCallback, useEffect, useMemo, useReducer, useRef, useContext,
+  createContext, useState, useEffect, useMemo, useReducer, useRef, useContext,
 } = React;
 
 function createReducer(initState: any = {}, actionMap?: IActionMap) {
@@ -87,24 +87,19 @@ export default function createRoot(
   const store = new Store();
   let enhanceDispatch: Function;
 
+  const reducerProxy = (s: IState, payload: IAction) => {
+    const n = reducer(s, payload);
+    store.set(n);
+    return n;
+  };
+
   const Provider = ({ value, children }: IProvider) => {
     const [
       state, dispatch,
-    ] = useReducer((s: IState, payload: IAction) => {
-      const n = reducer(s, payload);
-      store.set(n);
-      return n;
-    }, value);
-
-    const log = useCallback((action: IAction) => {
-      if (window.location.href.includes('debug')) {
-        console.log(action);
-      }
-      dispatch(action);
-    }, []);
+    ] = useReducer(reducerProxy, value);
 
     if (!enhanceDispatch) {
-      enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
+      enhanceDispatch = enhancer({ getState: store.getState, dispatch });
     }
     const ref: any = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
 

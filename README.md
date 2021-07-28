@@ -3,6 +3,8 @@
 
 推荐将global数据托管至async-reducer-context中，dispatch可支持同步异步等action。
 
+[点击codesandbox](https://codesandbox.io/s/gallant-smoke-zmp0u?file=/src/index.js)
+
 
 createProvider.js
 ```

@@ -70,21 +70,19 @@ export default function createRoot(reducers, enhancer) {
     }());
     var store = new Store();
     var enhanceDispatch;
+    var reducerProxy = function (s, payload) {
+        var n = reducer(s, payload);
+        store.set(n);
+        return n;
+    };
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
-        var _b = useReducer(function (s, payload) {
-            var n = reducer(s, payload);
-            store.set(n);
-            return n;
-        }, value), state = _b[0], dispatch = _b[1];
-        var log = useCallback(function (action) {
-            if (window.location.href.includes('debug')) {
-                console.log(action);
-            }
-            dispatch(action);
-        }, []);
+        var _b = useReducer(reducerProxy, value), state = _b[0], dispatch = _b[1];
+        useEffect(function () {
+            console.log('dispatch变化了');
+        }, [dispatch]);
         if (!enhanceDispatch) {
-            enhanceDispatch = enhancer({ getState: store.getState, dispatch: log });
+            enhanceDispatch = enhancer({ getState: store.getState, dispatch: dispatch });
         }
         var ref = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
         useEffect(function () {

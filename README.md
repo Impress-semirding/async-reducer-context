@@ -1,7 +1,5 @@
 # async-reducer-context
-通过底层react-context,useReducer替代redux，同时支持与redux类似的middleware中间件功能，通过useModel(['props'])可获取state和dispatch，其中useModel已做到获取的属性值变化，组件才会重新渲染，摆脱useContext因context中无关数据导致重复渲染问题。
-
-推荐将global数据托管至async-reducer-context中，dispatch可支持同步异步等action。
+通过react-context,useReducer替代redux，可扩展支持与redux周边middleware中间件，通过useModel(['key'])可获取state和dispatch，其中useModel已做到获取的属性值变化，组件才会重新渲染，摆脱useContext因context中无关数据导致的重复渲染问题。
 
 [点击codesandbox](https://codesandbox.io/s/gallant-smoke-zmp0u?file=/src/index.js)
 
@@ -14,10 +12,13 @@ import createRoot, { applyMiddleware } from 'async-reducer-context/src';
 
 import rootSaga from '../store/sagas/hello';
 
-const sagaMiddleware = createSagaMiddleware();
-const RootContext = createRoot({
+//  这里的key其实就是userReducer(reducer)函数中的action.type。
+const reducers = {
   INCREMENT: (states: any, payload: any) => ({ ...states, title: payload.title }),
-}, applyMiddleware(reduxThunk, sagaMiddleware));
+}
+
+const sagaMiddleware = createSagaMiddleware();
+const RootContext = createRoot(, applyMiddleware(reduxThunk, sagaMiddleware));
 
 RootContext.ready(() => sagaMiddleware.run(rootSaga));
 

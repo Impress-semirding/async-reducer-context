@@ -8,7 +8,7 @@ createProvider.js
 ```
 import createSagaMiddleware from 'redux-saga';
 import reduxThunk from 'redux-thunk';
-import createRoot, { applyMiddleware } from 'async-reducer-context/src';
+import createRoot, { applyMiddleware } from 'async-reducer-context';
 
 import rootSaga from '../store/sagas/hello';
 
@@ -24,6 +24,24 @@ RootContext.ready(() => sagaMiddleware.run(rootSaga));
 
 export default RootContext;
 ```
+
+
+如下是直接context和useReducer组合，但是dispatch没有异步能力。
+createProvider.js
+```
+import createRoot from 'async-reducer-context';
+
+//  这里的key其实就是userReducer(reducer)函数中的action.type。
+const reducers = {
+  INCREMENT: (states: any, payload: any) => ({ ...states, title: payload.title }),
+}
+
+const RootContext = createRoot(reducers);
+
+export default RootContext;
+```
+
+
 
 app.js
 ```
@@ -54,7 +72,7 @@ child.js
 ```
 import React, { useEffect } from 'react';
 
-import RootContext from '../../../context/util';
+import RootContext from '../../../context';
 import styles from './index.scss';
 
 export default function Title() {

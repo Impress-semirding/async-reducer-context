@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import EventEmitter from './event';
 import Subs from './sub';
-var createContext = React.createContext, useState = React.useState, useCallback = React.useCallback, useEffect = React.useEffect, useMemo = React.useMemo, useReducer = React.useReducer, useRef = React.useRef, useContext = React.useContext;
+var createContext = React.createContext, useState = React.useState, useEffect = React.useEffect, useMemo = React.useMemo, useReducer = React.useReducer, useRef = React.useRef, useContext = React.useContext;
 function createReducer(initState, actionMap) {
     if (initState === void 0) { initState = {}; }
     var handles = {};
@@ -78,9 +78,6 @@ export default function createRoot(reducers, enhancer) {
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
         var _b = useReducer(reducerProxy, value), state = _b[0], dispatch = _b[1];
-        useEffect(function () {
-            console.log('dispatch变化了');
-        }, [dispatch]);
         if (!enhanceDispatch) {
             enhanceDispatch = enhancer({ getState: store.getState, dispatch: dispatch });
         }

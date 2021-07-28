@@ -1,6 +1,5 @@
 var Subs = /** @class */ (function () {
-    function Subs(state) {
-        this.state = state;
+    function Subs() {
         this.observers = [];
     }
     Subs.prototype.add = function (observer) {

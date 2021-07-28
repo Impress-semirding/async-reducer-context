@@ -1,7 +1,6 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import EventEmitter from './event';
 import Subs from './sub';
 var createContext = React.createContext, useState = React.useState, useEffect = React.useEffect, useMemo = React.useMemo, useReducer = React.useReducer, useRef = React.useRef, useContext = React.useContext;
 function createReducer(initState, actionMap) {
@@ -23,13 +22,27 @@ function createReducer(initState, actionMap) {
         return state;
     };
 }
+//  provide getState for middleware.
+var Store = /** @class */ (function () {
+    function Store() {
+    }
+    Store.prototype.getState = function () {
+        return this.state;
+    };
+    Store.prototype.set = function (value) {
+        this.state = value;
+    };
+    return Store;
+}());
 export default function createRoot(reducers, enhancer) {
     var context = createContext({});
     var subContext = createContext({});
     var reducer = createReducer(reducers);
-    var event = new EventEmitter();
+    var middlewareSub = new Subs();
+    var store = new Store();
+    var enhanceDispatch;
     var ready = function (callback) {
-        event.on(callback);
+        middlewareSub.add(callback);
     };
     var useModel = function (deps) {
         if (deps === void 0) { deps = []; }
@@ -57,19 +70,6 @@ export default function createRoot(reducers, enhancer) {
         }, []);
         return [state, container.dispatch];
     };
-    var Store = /** @class */ (function () {
-        function Store() {
-        }
-        Store.prototype.getState = function () {
-            return this.state;
-        };
-        Store.prototype.set = function (value) {
-            this.state = value;
-        };
-        return Store;
-    }());
-    var store = new Store();
-    var enhanceDispatch;
     var reducerProxy = function (s, payload) {
         var n = reducer(s, payload);
         store.set(n);
@@ -78,23 +78,26 @@ export default function createRoot(reducers, enhancer) {
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
         var _b = useReducer(reducerProxy, value), state = _b[0], dispatch = _b[1];
-        if (!enhanceDispatch) {
-            enhanceDispatch = enhancer({ getState: store.getState, dispatch: dispatch });
+        if (enhancer && typeof enhancer === 'function') {
+            enhanceDispatch = enhanceDispatch || enhancer({ getState: store.getState, dispatch: dispatch });
         }
-        var ref = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
+        else {
+            enhanceDispatch = dispatch;
+        }
+        var ref = useRef({ state: value, subs: new Subs(), dispatch: enhanceDispatch });
         useEffect(function () {
             ref.current.state = state;
             ref.current.dispatch = enhanceDispatch;
             ref.current.subs.notify();
         });
+        //  异步调用middleware，特别为run(rootSaga)提供
         useEffect(function () {
-            event.run();
+            middlewareSub.notify();
         }, []);
         return (React.createElement(context.Provider, { value: { state: state, dispatch: enhanceDispatch } },
             React.createElement(subContext.Provider, { value: ref.current }, children)));
     };
     return {
-        context: context,
         Provider: Provider,
         useModel: useModel,
         ready: ready,

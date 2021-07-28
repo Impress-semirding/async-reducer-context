@@ -1,10 +1,7 @@
 class Subs {
-  state: any;
-
   observers: Function[]
 
-  constructor(state: any) {
-    this.state = state;
+  constructor() {
     this.observers = [];
   }
 

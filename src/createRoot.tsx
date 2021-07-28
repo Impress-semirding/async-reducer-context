@@ -1,7 +1,7 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import EventEmitter from './event';
+
 import Subs from './sub';
 import IState, {
   IAction, IActionMap, IProvider,
@@ -32,16 +32,31 @@ function createReducer(initState: any = {}, actionMap?: IActionMap) {
   };
 }
 
+//  provide getState for middleware.
+class Store {
+  state: any;
+
+  getState() {
+    return this.state;
+  }
+
+  set(value: any) {
+    this.state = value;
+  }
+}
+
 export default function createRoot(
   reducers: IActionMap, enhancer: any,
 ) {
   const context = createContext({});
   const subContext = createContext({});
   const reducer = createReducer(reducers);
-  const event = new EventEmitter();
+  const middlewareSub = new Subs();
+  const store = new Store();
+  let enhanceDispatch: Function;
 
   const ready = (callback: Function) => {
-    event.on(callback);
+    middlewareSub.add(callback);
   };
 
   const useModel = (deps: string[] = []) => {
@@ -72,21 +87,6 @@ export default function createRoot(
     return [state, container.dispatch];
   };
 
-  class Store {
-    state: any;
-
-    getState() {
-      return this.state;
-    }
-
-    set(value: any) {
-      this.state = value;
-    }
-  }
-
-  const store = new Store();
-  let enhanceDispatch: Function;
-
   const reducerProxy = (s: IState, payload: IAction) => {
     const n = reducer(s, payload);
     store.set(n);
@@ -98,10 +98,13 @@ export default function createRoot(
       state, dispatch,
     ] = useReducer(reducerProxy, value);
 
-    if (!enhanceDispatch) {
-      enhanceDispatch = enhancer({ getState: store.getState, dispatch });
+    if (enhancer && typeof enhancer === 'function') {
+      enhanceDispatch = enhanceDispatch || enhancer({ getState: store.getState, dispatch });
+    } else {
+      enhanceDispatch = dispatch;
     }
-    const ref: any = useRef({ state: value, subs: new Subs(state), dispatch: enhanceDispatch });
+
+    const ref: any = useRef({ state: value, subs: new Subs(), dispatch: enhanceDispatch });
 
     useEffect(() => {
       ref.current.state = state;
@@ -109,8 +112,9 @@ export default function createRoot(
       ref.current.subs.notify();
     });
 
+    //  异步调用middleware，特别为run(rootSaga)提供
     useEffect(() => {
-      event.run();
+      middlewareSub.notify();
     }, []);
 
     return (
@@ -123,7 +127,6 @@ export default function createRoot(
   };
 
   return {
-    context,
     Provider,
     useModel,
     ready,
